@@ -1,0 +1,1053 @@
+code 👇 for qr and bar code generator, put it in GitHub.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR & Barcode Generator | Kokila Rajendran</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Product+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="icon" href="https://ph-files.imgix.net/3934b123-dd0f-4c35-a99e-54600c465513.png?auto=format" type="image/x-icon">
+    <style>
+        :root {
+            --google-blue: #4285F4;
+            --google-red: #EA4335;
+            --google-yellow: #FBBC05;
+            --google-green: #34A853;
+            --google-gray: #F8F9FA;
+            --google-dark-gray: #5F6368;
+        }
+        
+        body {
+            font-family: 'Product Sans', Arial, sans-serif;
+            background-color: var(--google-gray);
+            color: var(--google-dark-gray);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .google-header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            position: relative;
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--google-dark-gray);
+        }
+        
+        .logo span {
+            margin-left: 10px;
+        }
+        
+        .logo-icon {
+            display: inline-flex;
+        }
+        
+        .logo-icon .blue { color: var(--google-blue); }
+        .logo-icon .red { color: var(--google-red); }
+        .logo-icon .yellow { color: var(--google-yellow); }
+        .logo-icon .green { color: var(--google-green); }
+        
+        .main-container {
+            flex: 1;
+            padding: 30px 0;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .card-header {
+            background: white;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            font-weight: 500;
+            color: var(--google-dark-gray);
+            padding: 15px 20px;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 10px 15px;
+            border: 1px solid #dadce0;
+            font-size: 15px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--google-blue);
+            box-shadow: 0 0 0 2px rgba(66,133,244,0.2);
+        }
+        
+        .btn-google {
+            background-color: var(--google-blue);
+            color: white;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            border: none;
+            transition: all 0.3s ease;
+            text-transform: none;
+        }
+        
+        .btn-google:hover {
+            background-color: #3367d6;
+            color: white;
+            box-shadow: 0 2px 6px rgba(66,133,244,0.3);
+        }
+        
+        .btn-google-secondary {
+            background-color: white;
+            color: var(--google-blue);
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-google-secondary:hover {
+            background-color: #f8f9fa;
+            border-color: #c6c6c6;
+        }
+        
+        .result-container {
+            text-align: center;
+            padding: 20px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px dashed #dadce0;
+        }
+        
+        #qrcode, #barcode {
+            max-width: 100%;
+            height: auto;
+            transition: all 0.3s ease;
+        }
+        
+        #qrcode:hover, #barcode:hover {
+            transform: scale(1.05);
+        }
+        
+        .download-btn {
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .download-options {
+            display: none;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        
+        .footer {
+            background: white;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 14px;
+            color: var(--google-dark-gray);
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
+        
+        .footer a {
+            color: var(--google-blue);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer a:hover {
+            color: #3367d6;
+            text-decoration: underline;
+        }
+        
+        .tab-content {
+            padding: 20px 0;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--google-dark-gray);
+            font-weight: 500;
+            padding: 12px 20px;
+            position: relative;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--google-blue);
+            background: transparent;
+        }
+        
+        .nav-tabs .nav-link.active:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--google-blue);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .nav-tabs .nav-link:not(.active):hover {
+            color: var(--google-blue);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes googleColors {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .loading {
+            display: none;
+            width: 50px;
+            height: 50px;
+            position: relative;
+        }
+        
+        .loading .dot {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: googleColors 1.5s infinite ease-in-out;
+        }
+        
+        .loading .dot:nth-child(1) {
+            background: var(--google-blue);
+            top: 0;
+            left: 20px;
+            animation-delay: 0s;
+        }
+        
+        .loading .dot:nth-child(2) {
+            background: var(--google-red);
+            top: 10px;
+            left: 10px;
+            animation-delay: 0.2s;
+        }
+        
+        .loading .dot:nth-child(3) {
+            background: var(--google-yellow);
+            top: 20px;
+            left: 0;
+            animation-delay: 0.4s;
+        }
+        
+        .loading .dot:nth-child(4) {
+            background: var(--google-green);
+            top: 10px;
+            left: 30px;
+            animation-delay: 0.6s;
+        }
+        
+        .history-container {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .history-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .history-item:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .history-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        
+        .history-item .content {
+            flex: 1;
+            margin: 0 15px;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .history-item .actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .toggle-history {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .storage-option {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 18px;
+            }
+            
+            .main-container {
+                padding: 20px 0;
+            }
+            
+            .card-header {
+                padding: 12px 15px;
+            }
+            
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .history-item img {
+                margin-bottom: 10px;
+            }
+            
+            .history-item .content {
+                margin: 10px 0;
+                width: 100%;
+            }
+            
+            .history-item .actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="google-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <span class="blue">Q</span>
+                        <span class="red">R</span>
+                        <span class="yellow">&</span>
+                        <span class="green">B</span>
+                    </div>
+                    <span>Generator</span>
+                </div>
+                <div>
+                    <a href="https://www.linkedin.com/in/kokila-rajendran/" target="_blank" class="btn btn-google-secondary btn-sm">
+                        <i class="fab fa-linkedin me-1"></i> Kokila Rajendran
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card">
+                        <div class="card-header">
+                            <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="qr-tab" data-bs-toggle="tab" data-bs-target="#qr-tab-pane" type="button" role="tab">
+                                        <i class="fas fa-qrcode me-2"></i>QR Code
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="barcode-tab" data-bs-toggle="tab" data-bs-target="#barcode-tab-pane" type="button" role="tab">
+                                        <i class="fas fa-barcode me-2"></i>Barcode
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="tab-content" id="myTabContent">
+                                <!-- QR Code Tab -->
+                                <div class="tab-pane fade show active" id="qr-tab-pane" role="tabpanel" aria-labelledby="qr-tab">
+                                    <form id="qrForm">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="qrText" class="form-label">Content to encode</label>
+                                                <input type="text" class="form-control" id="qrText" placeholder="Enter URL, text, or other content" required>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label for="qrSize" class="form-label">Size (px)</label>
+                                                <select class="form-select" id="qrSize">
+                                                    <option value="100">100</option>
+                                                    <option value="150">150</option>
+                                                    <option value="200" selected>200</option>
+                                                    <option value="250">250</option>
+                                                    <option value="300">300</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label for="qrColor" class="form-label">Color</label>
+                                                <select class="form-select" id="qrColor">
+                                                    <option value="#000000">Black</option>
+                                                    <option value="#4285F4">Google Blue</option>
+                                                    <option value="#EA4335">Google Red</option>
+                                                    <option value="#FBBC05">Google Yellow</option>
+                                                    <option value="#34A853">Google Green</option>
+                                                    <option value="#5F6368">Google Gray</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="qrBgColor" class="form-label">Background Color</label>
+                                                <select class="form-select" id="qrBgColor">
+                                                    <option value="#ffffff" selected>White</option>
+                                                    <option value="#F8F9FA">Light Gray</option>
+                                                    <option value="#E8F0FE">Light Blue</option>
+                                                    <option value="#FEE8E8">Light Red</option>
+                                                    <option value="#FEF7E0">Light Yellow</option>
+                                                    <option value="#E8F5E9">Light Green</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="qrErrorCorrection" class="form-label">Error Correction</label>
+                                                <select class="form-select" id="qrErrorCorrection">
+                                                    <option value="L">Low (7%)</option>
+                                                    <option value="M" selected>Medium (15%)</option>
+                                                    <option value="Q">Quartile (25%)</option>
+                                                    <option value="H">High (30%)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="storage-option">
+                                            <input type="checkbox" id="saveQrHistory" checked>
+                                            <label for="saveQrHistory">Save to generation history</label>
+                                        </div>
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                            <button type="reset" class="btn btn-google-secondary me-md-2">
+                                                <i class="fas fa-redo me-1"></i> Reset
+                                            </button>
+                                            <button type="submit" class="btn btn-google">
+                                                <i class="fas fa-qrcode me-1"></i> Generate QR Code
+                                            </button>
+                                        </div>
+                                    </form>
+                                    
+                                    <div class="result-container mt-4">
+                                        <div class="loading" id="qrLoading">
+                                            <div class="dot"></div>
+                                            <div class="dot"></div>
+                                            <div class="dot"></div>
+                                            <div class="dot"></div>
+                                        </div>
+                                        <div id="qrcode"></div>
+                                        <div class="download-options" id="qrDownloadOptions">
+                                            <button class="btn btn-google" id="downloadQrPng">
+                                                <i class="fas fa-image me-1"></i> PNG
+                                            </button>
+                                            <button class="btn btn-google" id="downloadQrJpg">
+                                                <i class="fas fa-image me-1"></i> JPG
+                                            </button>
+                                            <button class="btn btn-google" id="downloadQrPdf">
+                                                <i class="fas fa-file-pdf me-1"></i> PDF
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Barcode Tab -->
+                                <div class="tab-pane fade" id="barcode-tab-pane" role="tabpanel" aria-labelledby="barcode-tab">
+                                    <form id="barcodeForm">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="barcodeText" class="form-label">Content to encode</label>
+                                                <input type="text" class="form-control" id="barcodeText" placeholder="Enter numbers or text" required>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label for="barcodeType" class="form-label">Barcode Type</label>
+                                                <select class="form-select" id="barcodeType">
+                                                    <option value="CODE128">CODE128</option>
+                                                    <option value="EAN13">EAN-13</option>
+                                                    <option value="UPC">UPC</option>
+                                                    <option value="CODE39">CODE39</option>
+                                                    <option value="ITF14">ITF-14</option>
+                                                    <option value="MSI">MSI</option>
+                                                    <option value="pharmacode">Pharmacode</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label for="barcodeColor" class="form-label">Color</label>
+                                                <select class="form-select" id="barcodeColor">
+                                                    <option value="#000000">Black</option>
+                                                    <option value="#4285F4">Google Blue</option>
+                                                    <option value="#EA4335">Google Red</option>
+                                                    <option value="#FBBC05">Google Yellow</option>
+                                                    <option value="#34A853">Google Green</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <label for="barcodeWidth" class="form-label">Line Width</label>
+                                                <input type="number" class="form-control" id="barcodeWidth" min="1" max="5" value="2">
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="barcodeHeight" class="form-label">Height (px)</label>
+                                                <input type="number" class="form-control" id="barcodeHeight" min="20" max="200" value="100">
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="barcodeDisplayValue" class="form-label">Display Text</label>
+                                                <select class="form-select" id="barcodeDisplayValue">
+                                                    <option value="true">Show</option>
+                                                    <option value="false">Hide</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="storage-option">
+                                            <input type="checkbox" id="saveBarcodeHistory" checked>
+                                            <label for="saveBarcodeHistory">Save to generation history</label>
+                                        </div>
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                            <button type="reset" class="btn btn-google-secondary me-md-2">
+                                                <i class="fas fa-redo me-1"></i> Reset
+                                            </button>
+                                            <button type="submit" class="btn btn-google">
+                                                <i class="fas fa-barcode me-1"></i> Generate Barcode
+                                            </button>
+                                        </div>
+                                    </form>
+                                    
+                                    <div class="result-container mt-4">
+                                        <div class="loading" id="barcodeLoading">
+                                            <div class="dot"></div>
+                                            <div class="dot"></div>
+                                            <div class="dot"></div>
+                                            <div class="dot"></div>
+                                        </div>
+                                        <svg id="barcode"></svg>
+                                        <div class="download-options" id="barcodeDownloadOptions">
+                                            <button class="btn btn-google" id="downloadBarcodePng">
+                                                <i class="fas fa-image me-1"></i> PNG
+                                            </button>
+                                            <button class="btn btn-google" id="downloadBarcodeJpg">
+                                                <i class="fas fa-image me-1"></i> JPG
+                                            </button>
+                                            <button class="btn btn-google" id="downloadBarcodePdf">
+                                                <i class="fas fa-file-pdf me-1"></i> PDF
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- History Section -->
+                    <div class="history-container" id="historyContainer">
+                        <h5 class="mb-3"><i class="fas fa-history me-2"></i>Generation History</h5>
+                        <div id="historyItems"></div>
+                        <div class="d-flex justify-content-end mt-2">
+                            <button class="btn btn-sm btn-google-secondary" id="clearHistory">
+                                <i class="fas fa-trash me-1"></i> Clear History
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="toggle-history">
+                        <button class="btn btn-google-secondary" id="toggleHistoryBtn">
+                            <i class="fas fa-history me-1"></i> Show Generation History
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-md-start">
+                    <span>Developed by <a href="https://www.linkedin.com/in/kokila-rajendran/" target="_blank">Kokila Rajendran</a></span>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <span>Final Year ECE Student</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // QR Code Generation
+            const qrForm = document.getElementById('qrForm');
+            const qrText = document.getElementById('qrText');
+            const qrSize = document.getElementById('qrSize');
+            const qrColor = document.getElementById('qrColor');
+            const qrBgColor = document.getElementById('qrBgColor');
+            const qrErrorCorrection = document.getElementById('qrErrorCorrection');
+            const qrcodeDiv = document.getElementById('qrcode');
+            const qrLoading = document.getElementById('qrLoading');
+            const qrDownloadOptions = document.getElementById('qrDownloadOptions');
+            const saveQrHistory = document.getElementById('saveQrHistory');
+            
+            // QR Download Buttons
+            const downloadQrPng = document.getElementById('downloadQrPng');
+            const downloadQrJpg = document.getElementById('downloadQrJpg');
+            const downloadQrPdf = document.getElementById('downloadQrPdf');
+            
+            // Barcode Generation
+            const barcodeForm = document.getElementById('barcodeForm');
+            const barcodeText = document.getElementById('barcodeText');
+            const barcodeType = document.getElementById('barcodeType');
+            const barcodeColor = document.getElementById('barcodeColor');
+            const barcodeWidth = document.getElementById('barcodeWidth');
+            const barcodeHeight = document.getElementById('barcodeHeight');
+            const barcodeDisplayValue = document.getElementById('barcodeDisplayValue');
+            const barcodeSvg = document.getElementById('barcode');
+            const barcodeLoading = document.getElementById('barcodeLoading');
+            const barcodeDownloadOptions = document.getElementById('barcodeDownloadOptions');
+            const saveBarcodeHistory = document.getElementById('saveBarcodeHistory');
+            
+            // Barcode Download Buttons
+            const downloadBarcodePng = document.getElementById('downloadBarcodePng');
+            const downloadBarcodeJpg = document.getElementById('downloadBarcodeJpg');
+            const downloadBarcodePdf = document.getElementById('downloadBarcodePdf');
+            
+            // History Elements
+            const historyContainer = document.getElementById('historyContainer');
+            const historyItems = document.getElementById('historyItems');
+            const toggleHistoryBtn = document.getElementById('toggleHistoryBtn');
+            const clearHistory = document.getElementById('clearHistory');
+            
+            // Initialize with sample data for demo
+            qrText.value = 'https://www.linkedin.com/in/kokila-rajendran/';
+            barcodeText.value = '123456789012';
+            
+            // Load history from localStorage
+            let generationHistory = JSON.parse(localStorage.getItem('generationHistory')) || [];
+            renderHistory();
+            
+            // ...existing code...
+// Generate QR Code
+qrForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const text = qrText.value.trim();
+    if (!text) {
+        alert('Please enter content to encode');
+        return;
+    }
+
+    // Show loading animation
+    qrcodeDiv.innerHTML = '';
+    qrLoading.style.display = 'block';
+    qrDownloadOptions.style.display = 'none';
+
+    setTimeout(() => {
+        try {
+            qrcodeDiv.innerHTML = '';
+            // Use qrcodejs for browser
+            const qrCode = new QRCode(qrcodeDiv, {
+                text: text,
+                width: parseInt(qrSize.value),
+                height: parseInt(qrSize.value),
+                colorDark: qrColor.value,
+                colorLight: qrBgColor.value,
+                correctLevel: QRCode.CorrectLevel[qrErrorCorrection.value]
+            });
+
+            // Success
+            const canvas = qrcodeDiv.querySelector('canvas');
+            if (canvas) {
+                canvas.style.borderRadius = '8px';
+                canvas.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                qrDownloadOptions.style.display = 'flex';
+
+                // Save to history if enabled
+                if (saveQrHistory.checked) {
+                    const historyItem = {
+                        type: 'qr',
+                        content: text,
+                        timestamp: new Date().toISOString(),
+                        dataUrl: canvas.toDataURL('image/png'),
+                        settings: {
+                            size: qrSize.value,
+                            color: qrColor.value,
+                            bgColor: qrBgColor.value,
+                            errorCorrection: qrErrorCorrection.value
+                        }
+                    };
+                    addToHistory(historyItem);
+                }
+            }
+            qrLoading.style.display = 'none';
+        } catch (error) {
+            console.error(error);
+            qrcodeDiv.innerHTML = '<div class="alert alert-danger">Error generating QR code</div>';
+            qrLoading.style.display = 'none';
+        }
+    }, 500);
+});
+// ...existing code...
+            
+            // Download QR as PNG
+            downloadQrPng.addEventListener('click', function() {
+                const canvas = qrcodeDiv.querySelector('canvas');
+                if (canvas) {
+                    const link = document.createElement('a');
+                    link.download = 'qrcode.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }
+            });
+            
+            // Download QR as JPG
+            downloadQrJpg.addEventListener('click', function() {
+                const canvas = qrcodeDiv.querySelector('canvas');
+                if (canvas) {
+                    const link = document.createElement('a');
+                    link.download = 'qrcode.jpg';
+                    link.href = canvas.toDataURL('image/jpeg', 0.9);
+                    link.click();
+                }
+            });
+            
+            // Download QR as PDF
+            downloadQrPdf.addEventListener('click', function() {
+                const canvas = qrcodeDiv.querySelector('canvas');
+                if (canvas) {
+                    const pdf = new jsPDF();
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 50;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    pdf.addImage(imgData, 'PNG', (pdf.internal.pageSize.getWidth() - imgWidth) / 2, 40, imgWidth, imgHeight);
+                    pdf.text('QR Code: ' + qrText.value, 10, 20);
+                    pdf.save('qrcode.pdf');
+                }
+            });
+            
+            // Generate Barcode
+            barcodeForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const text = barcodeText.value.trim();
+                if (!text) {
+                    alert('Please enter content to encode');
+                    return;
+                }
+                
+                // Show loading animation
+                barcodeSvg.innerHTML = '';
+                barcodeLoading.style.display = 'block';
+                barcodeDownloadOptions.style.display = 'none';
+                
+                // Generate barcode
+                setTimeout(() => {
+                    try {
+                        barcodeSvg.innerHTML = '';
+                        JsBarcode(barcodeSvg, text, {
+                            format: barcodeType.value,
+                            lineColor: barcodeColor.value,
+                            width: parseInt(barcodeWidth.value),
+                            height: parseInt(barcodeHeight.value),
+                            displayValue: barcodeDisplayValue.value === 'true',
+                            margin: 10,
+                            background: 'transparent'
+                        });
+                        
+                        // Success
+                        barcodeDownloadOptions.style.display = 'flex';
+                        
+                        // Save to history if enabled
+                        if (saveBarcodeHistory.checked) {
+                            const serializer = new XMLSerializer();
+                            const svgStr = serializer.serializeToString(barcodeSvg);
+                            const svgData = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
+                            
+                            const historyItem = {
+                                type: 'barcode',
+                                content: text,
+                                timestamp: new Date().toISOString(),
+                                dataUrl: svgData,
+                                settings: {
+                                    type: barcodeType.value,
+                                    color: barcodeColor.value,
+                                    width: barcodeWidth.value,
+                                    height: barcodeHeight.value,
+                                    displayValue: barcodeDisplayValue.value
+                                }
+                            };
+                            addToHistory(historyItem);
+                        }
+                        
+                        barcodeLoading.style.display = 'none';
+                    } catch (error) {
+                        console.error(error);
+                        barcodeSvg.innerHTML = '<div class="alert alert-danger">Error generating barcode: ' + error.message + '</div>';
+                        barcodeLoading.style.display = 'none';
+                    }
+                }, 500);
+            });
+            
+            // Download Barcode as PNG
+            downloadBarcodePng.addEventListener('click', function() {
+                if (barcodeSvg.innerHTML.trim() === '') return;
+                
+                const serializer = new XMLSerializer();
+                const svgStr = serializer.serializeToString(barcodeSvg);
+                
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    const link = document.createElement('a');
+                    link.download = 'barcode.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                };
+                
+                img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
+            });
+            
+            // Download Barcode as JPG
+            downloadBarcodeJpg.addEventListener('click', function() {
+                if (barcodeSvg.innerHTML.trim() === '') return;
+                
+                const serializer = new XMLSerializer();
+                const svgStr = serializer.serializeToString(barcodeSvg);
+                
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    const link = document.createElement('a');
+                    link.download = 'barcode.jpg';
+                    link.href = canvas.toDataURL('image/jpeg', 0.9);
+                    link.click();
+                };
+                
+                img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
+            });
+            
+            // Download Barcode as PDF
+            downloadBarcodePdf.addEventListener('click', function() {
+                if (barcodeSvg.innerHTML.trim() === '') return;
+                
+                const serializer = new XMLSerializer();
+                const svgStr = serializer.serializeToString(barcodeSvg);
+                const svgData = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
+                
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    const pdf = new jsPDF();
+                    const imgWidth = 100;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 
+                                (pdf.internal.pageSize.getWidth() - imgWidth) / 2, 40, 
+                                imgWidth, imgHeight);
+                    pdf.text('Barcode: ' + barcodeText.value, 10, 20);
+                    pdf.save('barcode.pdf');
+                };
+                
+                img.src = svgData;
+            });
+            
+            // Toggle history visibility
+            toggleHistoryBtn.addEventListener('click', function() {
+                if (historyContainer.style.display === 'none' || !historyContainer.style.display) {
+                    historyContainer.style.display = 'block';
+                    toggleHistoryBtn.innerHTML = '<i class="fas fa-history me-1"></i> Hide Generation History';
+                } else {
+                    historyContainer.style.display = 'none';
+                    toggleHistoryBtn.innerHTML = '<i class="fas fa-history me-1"></i> Show Generation History';
+                }
+            });
+            
+            // Clear history
+            clearHistory.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all generation history?')) {
+                    generationHistory = [];
+                    localStorage.setItem('generationHistory', JSON.stringify(generationHistory));
+                    renderHistory();
+                }
+            });
+            
+            // Add item to history
+            function addToHistory(item) {
+                generationHistory.unshift(item); // Add to beginning
+                if (generationHistory.length > 20) {
+                    generationHistory.pop(); // Keep only last 20 items
+                }
+                localStorage.setItem('generationHistory', JSON.stringify(generationHistory));
+                renderHistory();
+            }
+            
+            // Render history items
+            function renderHistory() {
+                historyItems.innerHTML = '';
+                
+                if (generationHistory.length === 0) {
+                    historyItems.innerHTML = '<div class="alert alert-info">No generation history yet</div>';
+                    return;
+                }
+                
+                generationHistory.forEach((item, index) => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    
+                    const typeIcon = item.type === 'qr' ? 
+                        '<i class="fas fa-qrcode" style="color: #4285F4; font-size: 24px;"></i>' : 
+                        '<i class="fas fa-barcode" style="color: #34A853; font-size: 24px;"></i>';
+                    
+                    const date = new Date(item.timestamp);
+                    const formattedDate = date.toLocaleString();
+                    
+                    historyItem.innerHTML = `
+                        ${typeIcon}
+                        <div class="content">
+                            <strong>${item.content}</strong><br>
+                            <small class="text-muted">${formattedDate}</small>
+                        </div>
+                        <img src="${item.dataUrl}" alt="${item.type}">
+                        <div class="actions">
+                            <button class="btn btn-sm btn-google-secondary view-history" data-index="${index}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-google download-history" data-index="${index}">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    historyItems.appendChild(historyItem);
+                });
+                
+                // Add event listeners to view buttons
+                document.querySelectorAll('.view-history').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = this.getAttribute('data-index');
+                        const item = generationHistory[index];
+                        
+                        if (item.type === 'qr') {
+                            // Switch to QR tab
+                            document.getElementById('qr-tab').click();
+                            // Fill form with history settings
+                            qrText.value = item.content;
+                            qrSize.value = item.settings.size;
+                            qrColor.value = item.settings.color;
+                            qrBgColor.value = item.settings.bgColor;
+                            qrErrorCorrection.value = item.settings.errorCorrection;
+                            // Submit form to regenerate
+                            qrForm.dispatchEvent(new Event('submit'));
+                        } else {
+                            // Switch to Barcode tab
+                            document.getElementById('barcode-tab').click();
+                            // Fill form with history settings
+                            barcodeText.value = item.content;
+                            barcodeType.value = item.settings.type;
+                            barcodeColor.value = item.settings.color;
+                            barcodeWidth.value = item.settings.width;
+                            barcodeHeight.value = item.settings.height;
+                            barcodeDisplayValue.value = item.settings.displayValue.toString();
+                            // Submit form to regenerate
+                            barcodeForm.dispatchEvent(new Event('submit'));
+                        }
+                    });
+                });
+                
+                // Add event listeners to download buttons
+                document.querySelectorAll('.download-history').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = this.getAttribute('data-index');
+                        const item = generationHistory[index];
+                        
+                        const link = document.createElement('a');
+                        link.download = ${item.type}_${new Date(item.timestamp).getTime()}.png;
+                        link.href = item.dataUrl;
+                        link.click();
+                    });
+                });
+            }
+            
+            // Reset forms
+            document.querySelectorAll('button[type="reset"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const form = this.closest('form');
+                    const downloadOptions = form.nextElementSibling.querySelector('.download-options');
+                    downloadOptions.style.display = 'none';
+                    
+                    if (form.id === 'qrForm') {
+                        qrcodeDiv.innerHTML = '';
+                    } else {
+                        barcodeSvg.innerHTML = '';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
