@@ -23,6 +23,7 @@ The application runs from the command line, where users specify the input text a
 
 - Java 8 or above
 - ZXing core and javase libraries
+- 
 **Website** link:https://kokila-qr-barcode-generator.netlify.app/
 
 ## 📥 Installation
